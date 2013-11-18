@@ -110,11 +110,42 @@ class Monitor implements IOCallback {
 	}
 	
 	private void printTop(Result result) {
-		
+		// Don't bother trying if our caller is offline or null
+		if(this.caller != null && this.caller.isOnline()) {
+			if(result == null) {
+				this.caller.sendMessage(ChatColor.RED + "There are no recorded accounts to list!");
+			} else {
+				this.caller.sendMessage(ChatColor.YELLOW + "Top 10 balances on the server:");
+				DecimalFormat df = new DecimalFormat("#.00");
+				int count = 1;
+				while(result.next()) {
+					String entry = ChatColor.GREEN + "" + count + ".  '" + ChatColor.DARK_GREEN + (String)result.get(0) +
+						ChatColor.GREEN + "' with $" + ChatColor.DARK_GREEN + df.format((double)result.get(1));
+					this.caller.sendMessage(entry);
+					count++;
+				}
+			}
+		}
 	}
 	
 	private void printSpecific(Result result) {
-		
+		// Don't bother trying if our caller is offline or null
+		if(this.caller != null && this.caller.isOnline()) {
+			if(result == null) {
+				this.caller.sendMessage(ChatColor.RED + "There are no recorded transactions between '" + this.owner + "' and '" + this.target + "'!");
+			} else {
+				this.caller.sendMessage(ChatColor.YELLOW + "Recent transactions between '" + ChatColor.GOLD + this.owner + ChatColor.YELLOW +  "' and '" + ChatColor.GOLD + this.target + ChatColor.YELLOW + "':");
+				DecimalFormat df = new DecimalFormat("#.00");
+				while(result.next()) {
+					Date date = new Date((long)result.get(4));
+					String entry = ChatColor.GREEN + "  [#" + ChatColor.DARK_GREEN + (int)result.get(0) +
+						ChatColor.GREEN + " ::: $" + ChatColor.DARK_GREEN + df.format((double)result.get(3)) + ChatColor.GREEN + " from " +
+						ChatColor.DARK_GREEN + (String)result.get(1) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + (String)result.get(2) +
+						ChatColor.GREEN + " at " + ChatColor.DARK_GREEN + date.toString() + ChatColor.GREEN + "]";
+					this.caller.sendMessage(entry);
+				}
+			}
+		}
 	}
 
 	@Override
