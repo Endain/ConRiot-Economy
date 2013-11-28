@@ -17,6 +17,7 @@ class Executor implements IOCallback {
 		this.newFromBal = newFromBal;
 		this.newToBal = newToBal;
 		
+		// Execute this transaction
 		execute();
 	}
 	

@@ -1,11 +1,16 @@
 package net.conriot.economy;
 
-import net.conriot.sona.mysql.IOCallback;
-import net.conriot.sona.mysql.Result;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 
-class EconomyManager implements IOCallback {
-	public EconomyManager() {
-		// TODO
+class EconomyManager implements Listener {
+	public EconomyManager(Plugin plugin) {
+		// Register all events
+		Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	
 	public void payPlayer(String from, String to, double amount, TransactionCallback callback) {
@@ -24,11 +29,38 @@ class EconomyManager implements IOCallback {
 	}
 	
 	public void pay(String fromPrefix, String from, String toPrefix, String to, double amount, TransactionCallback callback) {
-		
+		// Create a new Transaction an pass it to a Validator
+		new Validator(new Transaction(fromPrefix, from, toPrefix, to, amount), callback);
 	}
-
-	@Override
-	public void complete(boolean success, Object tag, Result result) {
-		// TODO
+	
+	public void monitor(Player caller, String prefix, String owner, String target, String type) {
+		// Create a Monitor object and select an action to perform using it
+		Monitor m = new Monitor(caller, prefix, owner, target);
+		
+		switch(type.toLowerCase()) {
+		case "balance":
+			m.listSelf();
+			break;
+		case "recent":
+			m.listRecent();
+			break;
+		case "top":
+			m.listTop();
+			break;
+		case "specific":
+			m.listSpecific();
+			break;
+		}
+	}
+	
+	public void create(String prefix, String owner, double amount) {
+		// Attempt to create an account for the given owner with the given starting amount
+		new Creator(prefix, owner, amount);
+	}
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent event) {
+		// Attempt to create an account for the player who has just joined
+		create("", event.getPlayer().getName(), 2500);
 	}
 }

@@ -1,5 +1,7 @@
 package net.conriot.economy;
 
+import org.bukkit.Bukkit;
+
 import net.conriot.sona.mysql.IOCallback;
 import net.conriot.sona.mysql.MySQL;
 import net.conriot.sona.mysql.Query;
@@ -15,6 +17,7 @@ class Creator implements IOCallback {
 		this.owner = owner;
 		this.balance = balance;
 		
+		// First check if the account exists
 		check();
 	}
 	
@@ -34,14 +37,20 @@ class Creator implements IOCallback {
 		q.add(this.prefix + this.owner);
 		q.add(this.balance);
 		// Execute query to asynchronously create economy data
-		MySQL.execute(this, null, q);
+		MySQL.execute(this, "create:" + this.prefix + ":" + this.owner + ":" + this.balance, q);
 	}
 	
 	@Override
 	public void complete(boolean success, Object tag, Result result) {
-		if(tag instanceof String && ((String)tag).equals("check")) {
-			if(result == null)
-				create();
+		if(success) {
+			if(tag instanceof String && ((String)tag).equals("check")) {
+				// If the account did not exist then create it
+				if(result == null)
+					create();
+			} else if(tag instanceof String && ((String)tag).startsWith("create")) {
+				String[] split = ((String)tag).split(":");
+				Bukkit.getLogger().info("Created economy account '" + split[1] + split[2] + " with starting balance of $" + split[3]);
+			}
 		}
 	}
 }
