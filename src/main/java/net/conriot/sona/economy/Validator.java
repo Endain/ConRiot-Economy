@@ -1,4 +1,4 @@
-package net.conriot.economy;
+package net.conriot.sona.economy;
 
 import net.conriot.sona.mysql.IOCallback;
 import net.conriot.sona.mysql.MySQL;

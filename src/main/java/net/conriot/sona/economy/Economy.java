@@ -1,4 +1,4 @@
-package net.conriot.economy;
+package net.conriot.sona.economy;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -8,7 +8,14 @@ public class Economy extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		// Register the economy managed which will handle all transaction processing
 		this.economy = new EconomyManager(this);
+		// Register all basic economy commands for this manager
+		Commands c = new Commands(this.economy);
+		getCommand("pay").setExecutor(c);
+		getCommand("bal").setExecutor(c);
+		getCommand("baltop").setExecutor(c);
+		getCommand("eco").setExecutor(c);
 	}
 	
 	@Override

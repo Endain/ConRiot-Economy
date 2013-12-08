@@ -12,3 +12,13 @@ website: http://ConRiot.net
 description: Economy module developed for ConRiot
 author: [Endain]
 main: net.conriot.sona.economy.Economy
+depend: [CRM-MySQL]
+commands:
+  pay:
+    description: Make a payment to another player
+  bal:
+    description: View your current balance
+  baltop:
+    description: View the top 10 player balances
+  eco:
+    description: Economy management commands

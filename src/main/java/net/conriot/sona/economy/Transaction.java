@@ -1,4 +1,4 @@
-package net.conriot.economy;
+package net.conriot.sona.economy;
 
 import lombok.Getter;
 

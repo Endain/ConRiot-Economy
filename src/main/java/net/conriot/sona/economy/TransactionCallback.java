@@ -1,4 +1,4 @@
-package net.conriot.economy;
+package net.conriot.sona.economy;
 
 public interface TransactionCallback {
 	// Define a callback method that notes success and passes back transaction description object
