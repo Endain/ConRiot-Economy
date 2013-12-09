@@ -43,7 +43,7 @@ class Validator implements IOCallback {
 		// If to or from prefix is '**' it is to/from the server, validate accordingly
 		if(this.transaction.getFromPrefix().equals("**")) {
 			result.next();
-			if((this.transaction.getToPrefix() + this.transaction.getTo()).equals((String)result.get(0))) {
+			if((this.transaction.getToPrefix() + this.transaction.getTo()).equalsIgnoreCase((String)result.get(0))) {
 				// Record what the new balance of the 'to' account will be
 				this.newToBal = ((double)result.get(1) + this.transaction.getAmount());
 				// Payments from the server to an account will always succeed
@@ -54,7 +54,7 @@ class Validator implements IOCallback {
 			}
 		} else if(this.transaction.getToPrefix().equals("**")) {
 			result.next();
-			if((this.transaction.getFromPrefix() + this.transaction.getFrom()).equals((String)result.get(0))) {
+			if((this.transaction.getFromPrefix() + this.transaction.getFrom()).equalsIgnoreCase((String)result.get(0))) {
 				// Verify the account has enough to pay the server
 				if(((double)result.get(1) - this.transaction.getAmount()) >= 0) {
 					// Record the new balanced for the 'from' account
@@ -73,7 +73,7 @@ class Validator implements IOCallback {
 			
 			while(result.next()) {
 				// Check if this entry is the 'from' account
-				if((this.transaction.getFromPrefix() + this.transaction.getFrom()).equals(result.get(0))) {
+				if((this.transaction.getFromPrefix() + this.transaction.getFrom()).equalsIgnoreCase((String)result.get(0))) {
 					validFrom = true;
 					// Check if the 'from' account has enough funds
 					if(((double)result.get(1) - this.transaction.getAmount()) >= 0) {
@@ -83,7 +83,7 @@ class Validator implements IOCallback {
 					}
 				}
 				// Check if this entry is the 'to' account
-				else if((this.transaction.getToPrefix() + this.transaction.getTo()).equals(result.get(0))) {
+				else if((this.transaction.getToPrefix() + this.transaction.getTo()).equalsIgnoreCase((String)result.get(0))) {
 					// Record what the new balance of the 'to' account will be
 					this.newToBal = ((double)result.get(1) + this.transaction.getAmount());
 					validTo = true;

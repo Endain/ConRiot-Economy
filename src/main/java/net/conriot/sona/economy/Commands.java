@@ -21,12 +21,12 @@ class Commands implements CommandExecutor {
 	}
 	
 	private void pay(Player player, String[] args) {
-		if(args.length >= 3) {
+		if(args.length >= 2) {
 			try {
 				// Create a callback object so we can notify of success or failer
-				CommandTransaction callback = new CommandTransaction(player, "eco pay", args);
+				CommandTransaction callback = new CommandTransaction(player, "eco pay", args[0], args[1]);
 				// Execute the payment
-				this.economy.pay("", player.getName(), "", args[1], Double.parseDouble(args[2]), callback);
+				this.economy.pay("", player.getName(), "", args[0], Double.parseDouble(args[1]), callback);
 			} catch(NumberFormatException e) {
 				return;
 			}
@@ -34,19 +34,25 @@ class Commands implements CommandExecutor {
 	}
 	
 	private void eco(CommandSender sender, Command command, String label, String[] args) {
-		if(args.length >= 3) {
+		if(args.length >= 1) {
 			try {
 				// Determine which subcommand is being issued in order to act accordingly
 				String subcommand = (label + " " + args[0]).toLowerCase();
-				// Create a callback object so we can notify of success or failer
-				CommandTransaction callback = new CommandTransaction(sender, subcommand, args);
+				// Create a callback object so we can notify of success or failure
+				CommandTransaction callback = null;
+				if(args.length >= 3)
+					callback = new CommandTransaction(sender, subcommand, args[1], args[2]);
 				// Execute the given subcommand
-				if(subcommand.equals("eco give") && sender.isOp())
+				if(subcommand.equals("eco give") && args.length >= 3 && sender.isOp())
 					this.economy.givePlayer(args[1], Double.parseDouble(args[2]), callback);
-				else if(subcommand.equals("eco take") && sender.isOp())
+				else if(subcommand.equals("eco take") && args.length >= 3 && sender.isOp())
 					this.economy.takePlayer(args[1], Double.parseDouble(args[2]), callback);
-				else if(subcommand.equals("eco pay") && sender instanceof Player)
+				else if(subcommand.equals("eco pay") && args.length >= 3 && sender instanceof Player)
 					this.economy.pay("", ((Player)sender).getName(), "", args[1], Double.parseDouble(args[2]), callback);
+				else if(subcommand.equals("eco search") && args.length >= 2 && sender instanceof Player)
+					this.economy.monitor((Player)sender, "", sender.getName(), args[1], "specific");
+				else if(subcommand.equals("eco recent") && args.length >= 1 && sender instanceof Player)
+					this.economy.monitor((Player)sender, "", sender.getName(), "", "recent");
 			} catch(NumberFormatException e) {
 				return;
 			}

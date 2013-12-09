@@ -53,27 +53,33 @@ class Executor implements IOCallback {
 	}
 	
 	private void accountToAccount() {
-		// Create a query to add/remove money to/from the accounts
-		Query q = MySQL.makeQuery();
-		q.setQuery("UPDATE economy SET balance=? WHERE owner=?; UPDATE economy SET balance=? WHERE owner=?;");
-		q.add(this.newFromBal);
-		q.add(this.transaction.getFromPrefix() + this.transaction.getFrom());
-		q.add(this.newToBal);
-		q.add(this.transaction.getToPrefix() + this.transaction.getTo());
+		// Create a query to remove money from one accounts
+		Query qRemove = MySQL.makeQuery();
+		qRemove.setQuery("UPDATE economy SET balance=? WHERE owner=?");
+		qRemove.add(this.newFromBal);
+		qRemove.add(this.transaction.getFromPrefix() + this.transaction.getFrom());
 		// Execute query asynchronously
-		MySQL.execute(this, "execute", q);
+		MySQL.execute(this, "continue", qRemove);
+		
+		// Create a query to add money to the other account
+		Query qAdd = MySQL.makeQuery();
+		qAdd.setQuery("UPDATE economy SET balance=? WHERE owner=?");
+		qAdd.add(this.newToBal);
+		qAdd.add(this.transaction.getToPrefix() + this.transaction.getTo());
+		// Execute query asynchronously
+		MySQL.execute(this, "execute", qAdd);
 	}
 	
 	private void log() {
 		// Create a query to add money to the account
 		Query q = MySQL.makeQuery();
-		q.setQuery("INSERT INTO economy (from,to,amount,time) VALUES (?,?,?,?)");
+		q.setQuery("INSERT INTO economy_log (economy_log.from,economy_log.to,economy_log.amount,economy_log.time) VALUES (?,?,?,?)");
 		q.add(this.transaction.getFromPrefix() + this.transaction.getFrom());
 		q.add(this.transaction.getToPrefix() + this.transaction.getTo());
 		q.add(this.transaction.getAmount());
 		q.add(System.currentTimeMillis());
 		// Execute query asynchronously
-		MySQL.execute(this, "execute", q);
+		MySQL.execute(this, "log", q);
 	}
 
 	@Override

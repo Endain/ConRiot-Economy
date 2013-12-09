@@ -42,7 +42,7 @@ class Monitor implements IOCallback {
 		if(this.caller != null && this.caller.isOnline()) {
 			// Create a query to get the 10 most recent transactions
 			Query q = MySQL.makeQuery();
-			q.setQuery("SELECT * FROM economy_log WHERE from=? OR to=? ORDER BY time DESC LIMIT 10");
+			q.setQuery("SELECT * FROM economy_log WHERE economy_log.from=? OR economy_log.to=? ORDER BY time DESC LIMIT 10");
 			q.add(this.prefix + this.owner);
 			q.add(this.prefix + this.owner);
 			// Execute query to asynchronously
@@ -66,10 +66,10 @@ class Monitor implements IOCallback {
 		if(this.caller != null && this.caller.isOnline()) {
 			// Create a query to get the 10 most recent transactions
 			Query q = MySQL.makeQuery();
-			q.setQuery("SELECT * FROM economy_log WHERE (from=? AND to LIKE '%?%') OR (from LIKE '%?%' AND to=?) ORDER BY time DESC LIMIT 10");
+			q.setQuery("SELECT * FROM economy_log WHERE (economy_log.from=? AND economy_log.to LIKE ?) OR (economy_log.from LIKE ? AND economy_log.to=?) ORDER BY time DESC LIMIT 10");
 			q.add(this.prefix + this.owner);
-			q.add(target);
-			q.add(target);
+			q.add("%" + target + "%");
+			q.add("%" + target + "%");
 			q.add(this.prefix + this.owner);
 			// Execute query to asynchronously
 			MySQL.execute(this, "listSpecific", q);
@@ -98,12 +98,18 @@ class Monitor implements IOCallback {
 				this.caller.sendMessage(ChatColor.YELLOW + "Recent transactions for '" + ChatColor.GOLD + this.owner + ChatColor.YELLOW +  "':");
 				DecimalFormat df = new DecimalFormat("#.00");
 				while(result.next()) {
+					// Print the transaction id number
+					if(this.caller.getName().equalsIgnoreCase((String)result.get(1)))
+						this.caller.sendMessage(ChatColor.RED + " [ Transaction #" + ChatColor.DARK_RED + (int)result.get(0) + ChatColor.RED + " ]");
+					else
+						this.caller.sendMessage(ChatColor.GREEN + " [ Transaction #" + ChatColor.DARK_GREEN + (int)result.get(0) + ChatColor.GREEN + "]");
+					// Print the amount/from/to
+					String msg = ChatColor.DARK_GRAY + "   >  " + ChatColor.GRAY + "$" + ChatColor.GOLD + df.format((double)result.get(3)) + ChatColor.GRAY + " from " +
+						ChatColor.GOLD + (String)result.get(1) + ChatColor.GRAY + " to " + ChatColor.GOLD + (String)result.get(2);
+					this.caller.sendMessage(msg);
+					// Print the date the transaction occurred
 					Date date = new Date((long)result.get(4));
-					String entry = ChatColor.GREEN + "  [#" + ChatColor.DARK_GREEN + (int)result.get(0) +
-						ChatColor.GREEN + " ::: $" + ChatColor.DARK_GREEN + df.format((double)result.get(3)) + ChatColor.GREEN + " from " +
-						ChatColor.DARK_GREEN + (String)result.get(1) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + (String)result.get(2) +
-						ChatColor.GREEN + " at " + ChatColor.DARK_GREEN + date.toString() + ChatColor.GREEN + "]";
-					this.caller.sendMessage(entry);
+					this.caller.sendMessage(ChatColor.GRAY + "      @ " + ChatColor.YELLOW + date.toString());
 				}
 			}
 		}
@@ -119,8 +125,8 @@ class Monitor implements IOCallback {
 				DecimalFormat df = new DecimalFormat("#.00");
 				int count = 1;
 				while(result.next()) {
-					String entry = ChatColor.GREEN + "" + count + ".  '" + ChatColor.DARK_GREEN + (String)result.get(0) +
-						ChatColor.GREEN + "' with $" + ChatColor.DARK_GREEN + df.format((double)result.get(1));
+					String entry = ChatColor.GREEN + " " + count + ".  " + ChatColor.DARK_GREEN + (String)result.get(0) +
+						ChatColor.GREEN + " with $" + ChatColor.DARK_GREEN + df.format((double)result.get(1));
 					this.caller.sendMessage(entry);
 					count++;
 				}
@@ -137,12 +143,18 @@ class Monitor implements IOCallback {
 				this.caller.sendMessage(ChatColor.YELLOW + "Recent transactions between '" + ChatColor.GOLD + this.owner + ChatColor.YELLOW +  "' and '" + ChatColor.GOLD + this.target + ChatColor.YELLOW + "':");
 				DecimalFormat df = new DecimalFormat("#.00");
 				while(result.next()) {
+					// Print the transaction id number
+					if(this.caller.getName().equalsIgnoreCase((String)result.get(1)))
+						this.caller.sendMessage(ChatColor.RED + " [ Transaction #" + ChatColor.DARK_RED + (int)result.get(0) + ChatColor.RED + " ]");
+					else
+						this.caller.sendMessage(ChatColor.GREEN + " [ Transaction #" + ChatColor.DARK_GREEN + (int)result.get(0) + ChatColor.GREEN + "]");
+					// Print the amount/from/to
+					String msg = ChatColor.DARK_GRAY + "   >  " + ChatColor.GRAY + "$" + ChatColor.GOLD + df.format((double)result.get(3)) + ChatColor.GRAY + " from " +
+						ChatColor.GOLD + (String)result.get(1) + ChatColor.GRAY + " to " + ChatColor.GOLD + (String)result.get(2);
+					this.caller.sendMessage(msg);
+					// Print the date the transaction occurred
 					Date date = new Date((long)result.get(4));
-					String entry = ChatColor.GREEN + "  [#" + ChatColor.DARK_GREEN + (int)result.get(0) +
-						ChatColor.GREEN + " ::: $" + ChatColor.DARK_GREEN + df.format((double)result.get(3)) + ChatColor.GREEN + " from " +
-						ChatColor.DARK_GREEN + (String)result.get(1) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + (String)result.get(2) +
-						ChatColor.GREEN + " at " + ChatColor.DARK_GREEN + date.toString() + ChatColor.GREEN + "]";
-					this.caller.sendMessage(entry);
+					this.caller.sendMessage(ChatColor.GRAY + "      @ " + ChatColor.YELLOW + date.toString());
 				}
 			}
 		}
