@@ -45,11 +45,11 @@ class Creator implements IOCallback {
 		if(success) {
 			if(tag instanceof String && ((String)tag).equals("check")) {
 				// If the account did not exist then create it
-				if(result == null)
+				if(!result.next())
 					create();
 			} else if(tag instanceof String && ((String)tag).startsWith("create")) {
 				String[] split = ((String)tag).split(":");
-				Bukkit.getLogger().info("Created economy account '" + split[1] + split[2] + " with starting balance of $" + split[3]);
+				Bukkit.getLogger().info("Created economy account '" + split[1] + split[2] + " with starting balance of $" + Economy.format(Double.parseDouble(split[3])));
 			}
 		}
 	}

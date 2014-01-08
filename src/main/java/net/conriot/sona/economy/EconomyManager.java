@@ -67,6 +67,6 @@ class EconomyManager implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		// Attempt to create an account for the player who has just joined
-		create("", event.getPlayer().getName(), 2500);
+		create("", event.getPlayer().getName(), 250.00);
 	}
 }

@@ -1,15 +1,25 @@
 package net.conriot.sona.economy;
 
+import java.text.DecimalFormat;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Economy extends JavaPlugin {
 	private static EconomyManager economy;
+	private static DecimalFormat df;
 	
 	@Override
 	public void onEnable() {
 		// Register the economy managed which will handle all transaction processing
 		economy = new EconomyManager(this);
+		
+		// Create a DecimalFormat object to handle money values
+		df = new DecimalFormat();
+		df.setMinimumFractionDigits(2);
+		df.setMaximumFractionDigits(2);
+		df.setMinimumIntegerDigits(1);
+		
 		// Register all basic economy commands for this manager
 		Commands c = new Commands(economy);
 		getCommand("pay").setExecutor(c);
@@ -71,5 +81,9 @@ public class Economy extends JavaPlugin {
 	public static void create(String prefix, String owner, double amount) {
 		// Attempt to create an account for the given owner with the given starting amount
 		economy.create(prefix, owner, amount);
+	}
+	
+	public static String format(double value) {
+		return df.format(value);
 	}
 }
