@@ -120,8 +120,10 @@ class Monitor implements IOCallback {
 			if(result == null) {
 				this.caller.sendMessage(ChatColor.RED + "There is no account for '" + this.owner + "'!");
 			} else {
-				while(result.next()) {
-					this.caller.sendMessage(ChatColor.GREEN + "Balance for '" + ChatColor.DARK_GREEN + (String)result.get(0) + ChatColor.GREEN + "': $" + ChatColor.DARK_GREEN + (double)result.get(1));
+				// Print the result
+				DecimalFormat df = new DecimalFormat("#.00");
+				if(result.next()) {
+					this.caller.sendMessage(ChatColor.GREEN + "Balance for '" + ChatColor.DARK_GREEN + (String)result.get(0) + ChatColor.GREEN + "': $" + ChatColor.DARK_GREEN + df.format((double)result.get(1)));
 				}
 			}
 		}
