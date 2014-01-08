@@ -17,18 +17,41 @@ class Monitor implements IOCallback {
 	private String owner;
 	// Specific transactions parameters
 	private String target;
+	// Check balance callback
+	private TransactionCallback callback;
 	
 	public Monitor(Player caller, String prefix, String owner, String target) {
 		this.caller = caller;
 		this.prefix = prefix;
 		this.owner = owner;
 		this.target = target;
+		this.callback = null; // Unused in this case
+	}
+	
+	public Monitor(Player caller, TransactionCallback callback) {
+		this.caller = caller;
+		this.prefix = "";
+		this.owner = caller.getName();
+		this.target = caller.getName();
+		this.callback = callback;
+	}
+	
+	public void checkBalance() {
+		// Don't bother trying if our caller is offline or null
+		if(this.caller != null && this.caller.isOnline()) {
+			// Create a query to get the owners account balance
+			Query q = MySQL.makeQuery();
+			q.setQuery("SELECT * FROM economy WHERE owner=?");
+			q.add(this.prefix + this.owner);
+			// Execute query to asynchronously
+			MySQL.execute(this, "checkBalance", q);
+		}
 	}
 	
 	public void listSelf() {
 		// Don't bother trying if our caller is offline or null
 		if(this.caller != null && this.caller.isOnline()) {
-			// Create a query to get the 10 most recent transactions
+			// Create a query to get the owners account balance
 			Query q = MySQL.makeQuery();
 			q.setQuery("SELECT * FROM economy WHERE owner=?");
 			q.add(this.prefix + this.owner);
@@ -73,6 +96,21 @@ class Monitor implements IOCallback {
 			q.add(this.prefix + this.owner);
 			// Execute query to asynchronously
 			MySQL.execute(this, "listSpecific", q);
+		}
+	}
+	
+	private void sendBalance(Result result) {
+		// Don't bother trying if our caller is offline or null
+		if(this.caller != null && this.caller.isOnline()) {
+			if(result == null) {
+				this.callback.complete(Status.SYSTEM_ERROR, null);
+			} else {
+				if(result.next()) {
+					Transaction trans = new Transaction("", this.owner, "", this.owner, (double)result.get(0));
+					this.callback.complete(Status.SUCCESS, trans);
+				} else
+					this.callback.complete(Status.SYSTEM_ERROR, null);
+			}
 		}
 	}
 	
@@ -178,6 +216,9 @@ class Monitor implements IOCallback {
 				break;
 			case "listSpecific":
 				printSpecific(result);
+				break;
+			case "checkBalance":
+				sendBalance(result);
 				break;
 			}
 		}

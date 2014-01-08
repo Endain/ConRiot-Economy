@@ -43,6 +43,11 @@ public class Economy extends JavaPlugin {
 		new Validator(new Transaction(fromPrefix, from, toPrefix, to, amount), callback);
 	}
 	
+	public static void checkBalance(Player caller, TransactionCallback callback) {
+		// Check and return the current balance
+		economy.monitor(caller, callback);
+	}
+	
 	public static void getBalance(Player caller, String prefix, String owner, String target) {
 		// Monitor the calling player's balance
 		economy.monitor(caller, prefix, owner, target, "balance");

@@ -53,6 +53,12 @@ class EconomyManager implements Listener {
 		}
 	}
 	
+	public void monitor(Player caller, TransactionCallback callback) {
+		// Create a Monitor object and use it to retrieve the palyer's balance
+		Monitor m = new Monitor(caller, callback);
+		m.checkBalance();
+	}
+	
 	public void create(String prefix, String owner, double amount) {
 		// Attempt to create an account for the given owner with the given starting amount
 		new Creator(prefix, owner, amount);
